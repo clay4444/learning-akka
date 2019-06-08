@@ -7,7 +7,7 @@ class PongActor extends Actor with ActorLogging {
 
   def receive = {
   	case PingActor.PingMessage(text) =>
-      Thread.sleep(700)
+      Thread.sleep(700) //睡 0.7 秒
   	  log.info("In PongActor - received message: {}", text)
   	  sender() ! PongMessage("pong")
   }	

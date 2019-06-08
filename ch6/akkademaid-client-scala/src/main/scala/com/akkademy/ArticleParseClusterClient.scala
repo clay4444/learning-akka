@@ -15,18 +15,30 @@ object ArticleParseClusterClient {
     val timeout = new Timeout(Duration.create(5, "seconds"))
     val system = ActorSystem.create("clientSystem")
 
-
+    //初始化操作，/user/receptionist 是服务端加上内个依赖后自动启动的一个actor，可以帮助我们处理通信细节
     val initialContacts = Set(
       ActorPath.fromString("akka.tcp://Akkademy@127.0.0.1:2552/user/receptionist"),
       ActorPath.fromString("akka.tcp://Akkademy@127.0.0.1:2551/user/receptionist"))
+
     val settings = ClusterClientSettings(system)
       .withInitialContacts(initialContacts)
 
+    //创建 client actor
     val receptionist = system.actorOf(ClusterClient.props(settings), "client")
 
+    /**
+      * 远程 Actor 系统中的 Receptionist 可以接收一些不同的消息：也就是说下面指的是消息类型
+      * ClusterClient.Send：将消息发送至任意一个节点。
+      *  ClusterClient.SendToAll：将消息发送至集群中的所有节点。
+      *  ClusterClient.Publish：将消息发送给订阅了某个主题的所有 Actor。
+      */
+    //这里的目标Actor是：运行在集群中每个节点上的 Router，也就是说往这个Router 上发消息，
+    //path代表Router的路径；
     val msg = ClusterClient.Send("/user/workers", articleToParse, false)
 
+    //这里是测试才使用了ack，实际应该使用真正的 Actor 来发送并接收消息；
     val f = Patterns.ask(receptionist, msg, timeout)
+
     val result = Await.result(f, timeout.duration).asInstanceOf[String]
     println("result: " + result)
   }

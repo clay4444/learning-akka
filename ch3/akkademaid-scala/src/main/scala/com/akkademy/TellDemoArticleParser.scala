@@ -7,6 +7,20 @@ import akka.actor.{Actor, ActorRef, Props}
 import akka.util.Timeout
 import com.akkademy.messages.{GetRequest, SetRequest}
 
+/**
+  * tell: fire-and-forget
+  * 向Actor发送一条消息，所有发送至sender()的响应都会返回给消息的Actor，
+  *
+  * 不需要提供超时参数，
+  *
+  * 通过在Actor中存储一些状态，可以解决之前ask模式访问多个actor无法知道是哪个actor超时的问题，
+  *
+  * 不需要创建临时的actor，减小了额外的开销，
+  *
+  * 如果在Actor的系统的外部调用tell，而不使用ask，那么没有明显的方法用来接收并处理响应，此时的解决方案
+  * 新建一个临时的actor，用于处理消息的响应（ask其实就是用这种方式实现的）
+  *
+  */
 class TellDemoArticleParser(cacheActorPath: String,
                             httpClientActorPath: String,
                             articleParserActorPath: String,
@@ -31,9 +45,10 @@ class TellDemoArticleParser(cacheActorPath: String,
   override def receive: Receive = {
     case ParseArticle(uri) =>
 
+      //构建额外的Actor，用于处理响应；
       val extraActor = buildExtraActor(sender(), uri)
 
-      cacheActor.tell(GetRequest(uri), extraActor)
+      cacheActor.tell(GetRequest(uri), extraActor)  //extraActor 作为sender
       //类似于设置自己的返回收件箱
       //第一步,发送url
       httpClientActor.tell(uri, extraActor)
@@ -50,6 +65,9 @@ class TellDemoArticleParser(cacheActorPath: String,
   private def buildExtraActor(senderRef: ActorRef, uri: String): ActorRef = {
     return context.actorOf(Props(new Actor {
       override def receive = {
+
+        //在ask的例子中：有三个不同的超时会导致错误，而且我们不知道到底是哪个超时了
+        //而在这里，只有一个我们可以控制的超时：要么发生超时，要么运行成功；
         case "timeout" => //if we get timeout, then fail
           senderRef ! Failure(new TimeoutException("timeout!"))
           context.stop(self)

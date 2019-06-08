@@ -22,6 +22,6 @@ class PingActor extends Actor with ActorLogging {
 
 object PingActor {
   val props = Props[PingActor]
-  case object Initialize
-  case class PingMessage(text: String)
+  case object Initialize  //初始化消息
+  case class PingMessage(text: String) //ping 消息
 }

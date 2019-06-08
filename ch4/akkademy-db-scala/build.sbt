@@ -4,7 +4,7 @@ organization := "com.akkademy-db"
 
 version := "0.1.0-SNAPSHOT" //Version bump - add list, connected msg
 
-scalaVersion := "2.12.7"
+scalaVersion := "2.11.8"
 
 lazy val akkaVersion = "2.5.16"
 

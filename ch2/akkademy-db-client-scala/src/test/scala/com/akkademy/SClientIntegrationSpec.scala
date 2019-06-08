@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class SClientIntegrationSpec extends FunSpecLike with Matchers {
-  val client = new SClient("127.0.0.1:2552")
+  val client = new SClient("127.0.0.1:8989")
 
   describe("akkademyDbClient") {
       it("should set a value"){

@@ -29,6 +29,7 @@ class AkkademyDbSpec extends FunSpecLike with Matchers {
   describe("revert") {
     describe("normal request") {
       it("abcdef") {
+        import scala.concurrent.ExecutionContext.Implicits.global
         val actorRef = TestActorRef(new com.akkademy.RevertString)
         val future = actorRef ? "abcdef"
         future onComplete {

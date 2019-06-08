@@ -2,7 +2,7 @@ name := """akkademaid-scala"""
 
 version := "1.0"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.11.8"
 
 lazy val akkaVersion = "2.5.16"
 lazy val akkaHttpVersion = "10.0.10"

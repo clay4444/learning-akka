@@ -23,14 +23,17 @@ public class PongActorTest {
     ActorRef actorRef =
             system.actorOf(Props.create(JavaPongActor.class), "BruceWillis");
 
+    //success
     @Test
     public void shouldReplyToPingWithPong() throws Exception {
+        //返回的是scala.concurrent.Future
         Future sFuture = ask(actorRef, "Ping", 1000);
         final CompletionStage<String> cs = toJava(sFuture);
         final CompletableFuture<String> jFuture = (CompletableFuture<String>) cs;
         assertEquals("Pong", jFuture.get(1000, TimeUnit.MILLISECONDS));
     }
 
+    //failed
     @Test(expected = ExecutionException.class)
     public void shouldReplyToUnknownMessageWithFailure() throws Exception {
         Future sFuture = ask(actorRef, "unknown", 1000);
@@ -38,6 +41,8 @@ public class PongActorTest {
         final CompletableFuture<String> jFuture = (CompletableFuture<String>) cs;
         jFuture.get(1000, TimeUnit.MILLISECONDS);
     }
+
+    //=====
 
     //Future Examples
     @Test

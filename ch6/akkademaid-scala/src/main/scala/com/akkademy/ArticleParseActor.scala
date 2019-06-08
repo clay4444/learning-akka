@@ -6,6 +6,7 @@ class ArticleParseActor extends Actor{
   override def receive: Receive = {
     case htmlString: String =>
       val body: String = ArticleParser(htmlString)
+      println(s"---->${body}")
       sender() ! body
     case _ =>
       println("msg!")
