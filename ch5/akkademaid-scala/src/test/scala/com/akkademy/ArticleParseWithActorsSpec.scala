@@ -36,6 +36,13 @@ class ArticleParseWithActorsSpec extends FlatSpec with Matchers {
     //new RoundRobinPool(8).withSupervisorStrategy() 指定pool中actor的监督策略
 
 
+  //akka document
+  val escalator = OneForOneStrategy() {
+    case e ⇒ testActor ! e; SupervisorStrategy.Escalate
+  }
+  val router = system.actorOf(RoundRobinPool(1,supervisorStrategy = escalator).props(routeeProps = Props[TestActor]))
+
+
   //反例，不应该在主线程池中执行；
   //val ec:ExecutionContext = system.dispatchers.lookup("dispatcherid")  //获得一个额外定义的 Dispatcher
   val future: Future[Int] = Future {
@@ -59,7 +66,3 @@ class ArticleParseWithActorsSpec extends FlatSpec with Matchers {
     TestHelper.profile(() => Await.ready(p.future, 20 seconds), "Actors")
   }
 }
-
-
-
-
